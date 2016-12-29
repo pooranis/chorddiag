@@ -1,10 +1,11 @@
+var d3v35 = d3;
 HTMLWidgets.widget({
 
   name: 'chorddiag',
   type: 'output',
 
   initialize: function(el, width, height) {
-    var d3v35 = d3;
+
     d3v35.select(el).append("svg")
                  .attr("width", width)
                  .attr("height", height);
@@ -167,7 +168,7 @@ HTMLWidgets.widget({
   },
 
   resize: function(el, width, height, chord) {
-    var d3v35 = d3;
+
     d3v35.select(el).select("svg")
                  .attr("width", width)
                  .attr("height", height);
@@ -177,7 +178,7 @@ HTMLWidgets.widget({
   },
 
   renderValue: function(el, params, chord) {
-    var d3v35 = d3;
+
     // save params for reference from resize method
     chord.params = params;
 
@@ -365,7 +366,7 @@ HTMLWidgets.widget({
 
     // style chords and define mouse events
     chords.style("fill", function(d) { return fillScale(d.target.index); })
-          .style("stroke", chordedgeColor)
+          .style("stroke", function(d) { return fillScale(d.target.index); })
           .style("fill-opacity", 0.67)
           .style("stroke-width", "0.5px")
           .style("opacity", 1)
