@@ -9,7 +9,160 @@ HTMLWidgets.widget({
                  .attr("width", width)
                  .attr("height", height);
 
-    return d3.layout.chord();
+     newfr = function() {
+         var chord = {},
+             chords, groups, matrix, n, padding = 0,
+             sortGroups, sortSubgroups, sortChords, reversesort;
+
+         function relayout() {
+             var subgroups = {},
+                 groupSums = [],
+                 groupIndex = d3v35.range(n),
+                 subgroupIndex = [],
+                 k, x, x0, i, j;
+             chords = [];
+             groups = [];
+             k = 0, i = -1;
+             while (++i < n) {
+                 if (reversesort) {
+                     x = 0, j = n;
+                     while (--j > -1) {
+                         x += matrix[i][j];
+                     }
+                 } else {
+                     x = 0, j = -1;
+                     while (++j < n) {
+                         x += matrix[i][j];
+                     }
+                 }
+                 groupSums.push(x);
+                 subgroupIndex.push(d3v35.range(n));
+                 k += x;
+             }
+             if (sortGroups) {
+                 groupIndex.sort(function(a, b) {
+                     return sortGroups(groupSums[a], groupSums[b]);
+                 });
+             }
+             if (sortSubgroups) {
+                 subgroupIndex.forEach(function(d, i) {
+                     d.sort(function(a, b) {
+                         return sortSubgroups(matrix[i][a], matrix[i][b]);
+                     });
+                 });
+             }
+             k = (2 * Math.PI - padding * n) / k;
+             x = 0, i = -1;
+             while (++i < n) {
+                 if (reversesort) {
+                     x0 = x, j = n;
+                     while (--j > -1) {
+                         var di = groupIndex[i],
+                             dj = subgroupIndex[di][j],
+                             v = matrix[di][dj],
+                             a0 = x,
+                             a1 = x += v * k;
+                         subgroups[di + "-" + dj] = {
+                             index: di,
+                             subindex: dj,
+                             startAngle: a0,
+                             endAngle: a1,
+                             value: v
+                         };
+                     }
+                 } else {
+                     x0 = x, j = -1;
+                     while (++j < n) {
+                         var di = groupIndex[i],
+                             dj = subgroupIndex[di][j],
+                             v = matrix[di][dj],
+                             a0 = x,
+                             a1 = x += v * k;
+                         subgroups[di + "-" + dj] = {
+                             index: di,
+                             subindex: dj,
+                             startAngle: a0,
+                             endAngle: a1,
+                             value: v
+                         };
+                     }
+                 }
+                 groups[di] = {
+                     index: di,
+                     startAngle: x0,
+                     endAngle: x,
+                     value: groupSums[di]
+                 };
+                 x += padding;
+             }
+             i = -1;
+             while (++i < n) {
+                 j = i - 1;
+                 while (++j < n) {
+                     var source = subgroups[i + "-" + j],
+                         target = subgroups[j + "-" + i];
+                     if (source.value || target.value) {
+                         chords.push(source.value < target.value ? {
+                             source: target,
+                             target: source
+                         } : {
+                             source: source,
+                             target: target
+                         });
+                     }
+                 }
+             }
+             if (sortChords) resort();
+         }
+
+         function resort() {
+             chords.sort(function(a, b) {
+                 return sortChords((a.source.value + a.target.value) / 2, (b.source.value + b.target.value) / 2);
+             });
+         }
+         chord.matrix = function(x, y) {
+             if (!arguments.length) return matrix;
+             n = (matrix = x) && matrix.length;
+             reversesort = y;
+             chords = groups = null;
+             return chord;
+         };
+         chord.padding = function(x) {
+             if (!arguments.length) return padding;
+             padding = x;
+             chords = groups = null;
+             return chord;
+         };
+         chord.sortGroups = function(x) {
+             if (!arguments.length) return sortGroups;
+             sortGroups = x;
+             chords = groups = null;
+             return chord;
+         };
+         chord.sortSubgroups = function(x) {
+             if (!arguments.length) return sortSubgroups;
+             sortSubgroups = x;
+             chords = null;
+             return chord;
+         };
+         chord.sortChords = function(x) {
+             if (!arguments.length) return sortChords;
+             sortChords = x;
+             if (chords) resort();
+             return chord;
+         };
+         chord.chords = function() {
+             if (!chords) relayout();
+             return chords;
+         };
+         chord.groups = function() {
+             if (!groups) relayout();
+             return groups;
+         };
+         return chord;
+     };
+
+     return newfr();
 
   },
 
@@ -60,7 +213,8 @@ HTMLWidgets.widget({
         tooltipFontsize = options.tooltipFontsize,
         tooltipUnit = options.tooltipUnit,
         tooltipGroupConnector = options.tooltipGroupConnector,
-        precision = options.precision;
+        precision = options.precision,
+        reversesort = options.reversesort;
 
     d3v35.select(el).selectAll("div.d3-tip").remove();
 
@@ -113,7 +267,7 @@ HTMLWidgets.widget({
     // apply chord settings and data
     chord.padding(groupPadding)
          .sortSubgroups(d3v35.descending)
-         .matrix(matrix);
+         .matrix(matrix, reversesort);
 
     // calculate outer and inner radius for chord diagram
     var outerRadius = (d - 2 * margin) / 2,

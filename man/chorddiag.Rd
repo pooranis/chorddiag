@@ -19,7 +19,7 @@ chorddiag(data, type = "directional", width = NULL, height = NULL,
   showTooltips = TRUE, showZeroTooltips = TRUE, tooltipNames = NULL,
   tooltipUnit = NULL, tooltipFontsize = 12,
   tooltipGroupConnector = " &#x25B6; ", precision = NULL,
-  clickAction = NULL)
+  clickAction = NULL, reversesort = FALSE)
 }
 \arguments{
 \item{data}{A matrix containing the data. Must be square for the
@@ -116,7 +116,10 @@ display.}
 
 \item{clickAction}{character string containing JavaScript code to be executed
 on a mouse click so that shiny can get the sourceIndex and targetIndex for the purpose of filtering the data on other visualizations}
+
+\item{reversesort}{A logical scalar (defaults to FALSE).  If set to TRUE, the plotting order is reversed, and chords will not cross each other.}
 }
+
 \description{
 Create an interactive chord diagram using the JavaScript visualization
 library D3 (\url{http://d3js.org}). More specifically, the chord diagram
