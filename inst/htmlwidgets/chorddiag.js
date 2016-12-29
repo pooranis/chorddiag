@@ -4,8 +4,8 @@ HTMLWidgets.widget({
   type: 'output',
 
   initialize: function(el, width, height) {
-
-    d3.select(el).append("svg")
+    var d3v35 = d3;
+    d3v35.select(el).append("svg")
                  .attr("width", width)
                  .attr("height", height);
 
@@ -14,8 +14,8 @@ HTMLWidgets.widget({
   },
 
   resize: function(el, width, height, chord) {
-
-    d3.select(el).select("svg")
+    var d3v35 = d3;
+    d3v35.select(el).select("svg")
                  .attr("width", width)
                  .attr("height", height);
 
@@ -24,7 +24,7 @@ HTMLWidgets.widget({
   },
 
   renderValue: function(el, params, chord) {
-
+    var d3v35 = d3;
     // save params for reference from resize method
     chord.params = params;
 
@@ -62,10 +62,10 @@ HTMLWidgets.widget({
         tooltipGroupConnector = options.tooltipGroupConnector,
         precision = options.precision;
 
-    d3.select(el).selectAll("div.d3-tip").remove();
+    d3v35.select(el).selectAll("div.d3-tip").remove();
 
     if (showTooltips) {
-        var chordTip = d3.tip()
+        var chordTip = d3v35.tip()
                          .attr('class', 'd3-tip')
                          .style("font-size", tooltipFontsize + "px")
                          .style("font-family", "sans-serif")
@@ -95,7 +95,7 @@ HTMLWidgets.widget({
                              }
                          });
 
-        var groupTip = d3.tip()
+        var groupTip = d3v35.tip()
                          .attr('class', 'd3-tip')
                          .style("font-size", tooltipFontsize + "px")
                          .style("font-family", "sans-serif")
@@ -107,12 +107,12 @@ HTMLWidgets.widget({
                          });
     }
 
-    var svgContainer = d3.select(el).select("svg");
+    var svgContainer = d3v35.select(el).select("svg");
     svgContainer.selectAll("*").remove();
 
     // apply chord settings and data
     chord.padding(groupPadding)
-         .sortSubgroups(d3.descending)
+         .sortSubgroups(d3v35.descending)
          .matrix(matrix);
 
     // calculate outer and inner radius for chord diagram
@@ -120,8 +120,8 @@ HTMLWidgets.widget({
         innerRadius = outerRadius * (1 - groupThickness);
 
     // create ordinal color fill scale from groupColors
-    var fillScale = d3.scale.ordinal()
-                            .domain(d3.range(matrix.length))
+    var fillScale = d3v35.scale.ordinal()
+                            .domain(d3v35.range(matrix.length))
                             .range(groupColors);
 
     // calculate horizontal and vertical translation values
@@ -147,7 +147,7 @@ HTMLWidgets.widget({
     // style groups and define mouse events
     groups.style("fill", function(d) { return fillScale(d.index); })
           .style("stroke", function(d) { return fillScale(d.index); })
-          .attr("d", d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius))
+          .attr("d", d3v35.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius))
           .on("mouseover", function(d) {
               if (showTooltips) groupTip.show(d);
               return groupFade(d, fadeLevel);
@@ -207,7 +207,7 @@ HTMLWidgets.widget({
                         return "chord-" + groupNames[d.source.index]
                                + "-" + groupNames[d.target.index];
                     })
-                    .attr("d", d3.svg.chord().radius(innerRadius));
+                    .attr("d", d3v35.svg.chord().radius(innerRadius));
 
     // style chords and define mouse events
     chords.style("fill", function(d) { return fillScale(d.target.index); })
@@ -298,7 +298,7 @@ HTMLWidgets.widget({
     // returns an array of tick angles and labels, given a group
     function groupTicks(d) {
       var k = (d.endAngle - d.startAngle) / d.value;
-      return d3.range(0, d.value, tickInterval).map(function(v, i) {
+      return d3v35.range(0, d.value, tickInterval).map(function(v, i) {
         return {
           angle: v * k + d.startAngle,
           label: i % 5 ? null : v
@@ -352,4 +352,3 @@ HTMLWidgets.widget({
   }  // end renderValue function
 
 });
-
